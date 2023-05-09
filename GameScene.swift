@@ -7,93 +7,17 @@
 
 import SpriteKit
 import GameplayKit
-<<<<<<< HEAD
 
-class GameScene: SKScene {
-    
-    private var label : SKLabelNode?
-    private var spinnyNode : SKShapeNode?
-    
-    override func didMove(to view: SKView) {
-        
-        // Get label node from scene and store it for use later
-        self.label = self.childNode(withName: "//helloLabel") as? SKLabelNode
-        if let label = self.label {
-            label.alpha = 0.0
-            label.run(SKAction.fadeIn(withDuration: 2.0))
-        }
-        
-        // Create shape node to use during mouse interaction
-        let w = (self.size.width + self.size.height) * 0.05
-        self.spinnyNode = SKShapeNode.init(rectOf: CGSize.init(width: w, height: w), cornerRadius: w * 0.3)
-        
-        if let spinnyNode = self.spinnyNode {
-            spinnyNode.lineWidth = 2.5
-            
-            spinnyNode.run(SKAction.repeatForever(SKAction.rotate(byAngle: CGFloat(Double.pi), duration: 1)))
-            spinnyNode.run(SKAction.sequence([SKAction.wait(forDuration: 0.5),
-                                              SKAction.fadeOut(withDuration: 0.5),
-                                              SKAction.removeFromParent()]))
-        }
-    }
-    
-    
-    func touchDown(atPoint pos : CGPoint) {
-        if let n = self.spinnyNode?.copy() as! SKShapeNode? {
-            n.position = pos
-            n.strokeColor = SKColor.green
-            self.addChild(n)
-        }
-    }
-    
-    func touchMoved(toPoint pos : CGPoint) {
-        if let n = self.spinnyNode?.copy() as! SKShapeNode? {
-            n.position = pos
-            n.strokeColor = SKColor.blue
-            self.addChild(n)
-        }
-    }
-    
-    func touchUp(atPoint pos : CGPoint) {
-        if let n = self.spinnyNode?.copy() as! SKShapeNode? {
-            n.position = pos
-            n.strokeColor = SKColor.red
-            self.addChild(n)
-        }
-    }
-    
-    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-        if let label = self.label {
-            label.run(SKAction.init(named: "Pulse")!, withKey: "fadeInOut")
-        }
-        
-        for t in touches { self.touchDown(atPoint: t.location(in: self)) }
-    }
-    
-    override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
-        for t in touches { self.touchMoved(toPoint: t.location(in: self)) }
-    }
-    
-    override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
-        for t in touches { self.touchUp(atPoint: t.location(in: self)) }
-    }
-    
-    override func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent?) {
-        for t in touches { self.touchUp(atPoint: t.location(in: self)) }
-    }
-    
-    
-    override func update(_ currentTime: TimeInterval) {
-        // Called before each frame is rendered
-    }
-}
-=======
+
 var knightsIndex1 = [Knight]()
 var knightsIndex2 = [Knight]()
 var knightsIndex3 = [Knight]()
 var knightsIndex4 = [Knight]()
 var knightsIndex5 = [Knight]()
 var knightsIndex6 = [Knight]()
+
+
+
 
 var enemiesIndex_1 = [Knight]()
 var enemiesIndex_2 = [Knight]()
@@ -104,6 +28,7 @@ var enemiesIndex_6 = [Knight]()
 
 var samuraiSize = CGSize(width: 100, height: 100)
 var skeletonSize = CGSize(width: 85, height: 85)
+
 
 
 var isBattleIndex1 = false
@@ -123,7 +48,12 @@ var selectedCharacterIndex = 0
 
 
 
-
+var battle1:Battle!
+var battle2:Battle!
+var battle3:Battle!
+var battle4:Battle!
+var battle5:Battle!
+var battle6:Battle!
 
 class GameScene: SKScene,SKPhysicsContactDelegate {
     let enemyCategory:UInt32 = 0x1
@@ -131,10 +61,13 @@ class GameScene: SKScene,SKPhysicsContactDelegate {
     let mySideCategory:UInt32 = 0x100
     let enemySideCategory:UInt32 = 0x1000
 
+    var isBattleIndex = [false,false ,false , false,false,false ]
 
     
     var my_progressBar:SKSpriteNode!
     var enemy_progressBar:SKSpriteNode!
+    var my_progressBar_width = 690
+    var enemy_progressBar_width = 690
 
     var my_side:SKSpriteNode!
     var circle:SKShapeNode!
@@ -151,16 +84,11 @@ class GameScene: SKScene,SKPhysicsContactDelegate {
     var left_button: SKSpriteNode!
     var right_button: SKSpriteNode!
 
-    var battle1:Battle!
-    var battle2:Battle!
-    var battle3:Battle!
-    var battle4:Battle!
-    var battle5:Battle!
-    var battle6:Battle!
+    
+  
 
     var game:Game?
 
-    
 
 
     // Buton pozisyonunu ayarla
@@ -287,8 +215,21 @@ class GameScene: SKScene,SKPhysicsContactDelegate {
            }
             // Düşman puan kazandı
             game?.enemyPoint += 100
+            game?.myPoint -= 100
+           
+            my_progressBar.position.x -= CGFloat(40)
+            enemy_progressBar.position.x -= CGFloat(40)
+            enemy_progressBar.size.width += CGFloat(80)
             print(game?.enemyPoint)
-          
+            if game!.enemyPoint > 1699 {
+                game?.amIWinner = false
+                let scene = GameOver(fileNamed: "GameOver")
+                scene?.win = false
+                
+                scene?.scaleMode = .aspectFit
+                let transistion = SKTransition.push(with: .up, duration: 3.0)
+                self.view?.presentScene(scene!,transition: transistion)
+            }
             
 
             
@@ -324,9 +265,21 @@ class GameScene: SKScene,SKPhysicsContactDelegate {
            }
             //BEN PUAN KAZANDIM
             game?.myPoint += 100
-         
-
-
+            game?.enemyPoint -= 100
+          
+            enemy_progressBar.position.x += CGFloat(40)
+            my_progressBar.position.x += CGFloat(40)
+            my_progressBar.size.width += CGFloat(80)
+            if game!.myPoint > 1699 {
+                game?.amIWinner = true
+                let scene = GameOver(fileNamed: "GameOver")
+                scene?.win = true
+                
+                
+                scene?.scaleMode = .aspectFit
+                let transistion = SKTransition.push(with: .up, duration: 3.0)
+                self.view?.presentScene(scene!,transition: transistion)
+            }
             
         }
     
@@ -336,23 +289,23 @@ class GameScene: SKScene,SKPhysicsContactDelegate {
     func changeLabelColor(index:Int){
         if index == 0 {
             label1.fontColor = .systemGreen
-            label2.fontColor = .gray
+            label2.fontColor = .white.withAlphaComponent(0.7)
         }else {
-            label1.fontColor = .gray
+            label1.fontColor = .white.withAlphaComponent(0.7)
             label2.fontColor = .systemGreen
         }
     }
         
     override func didMove(to view: SKView) {
-   
+         isBattleIndex = [false,false ,false , false,false,false ]
+
         self.physicsWorld.contactDelegate = self
-    
         selectedIndex = 0
         selectedCharacterIndex = 0
         game = Game(time: 500, myPoint: 0, enemyPoint: 0, amIWinner: false, isCoolDown: false)
        
        label1 = SKLabelNode(text: "Samuray")
-        label1.zPosition = 10
+        label1.zPosition = 8
         label1.position = CGPoint(x: -450, y: 300)
         label1.fontName = "Helvetica-Bold"
         label1.fontSize = 30
@@ -361,7 +314,7 @@ class GameScene: SKScene,SKPhysicsContactDelegate {
         self.addChild(label1)
         
          label2 = SKLabelNode(text: "Skeleton")
-          label2.zPosition = 10
+          label2.zPosition = 8
           label2.position = CGPoint(x: -300, y: 300)
           label2.fontName = "Helvetica-Bold"
           label2.fontSize = 30
@@ -395,23 +348,23 @@ class GameScene: SKScene,SKPhysicsContactDelegate {
         enemy_side.name = "enemy_side"
         self.addChild(enemy_side)
         
-    /*
-        my_progressBar = SKSpriteNode(color: .green, size: CGSize(width:670, height: 30))
+    
+        my_progressBar = SKSpriteNode(color: .green.withAlphaComponent(0.5), size: CGSize(width:my_progressBar_width, height: 30))
         my_progressBar.position = CGPoint(x:-350, y: 360.0)
         my_progressBar.zPosition = 10
         my_progressBar.anchorPoint = CGPoint(x: 0.5, y: 0.5)
         self.addChild(my_progressBar)
   
-        enemy_progressBar = SKSpriteNode(color: .red, size: CGSize(width:670, height: 30))
+        enemy_progressBar = SKSpriteNode(color: .red.withAlphaComponent(0.5), size: CGSize(width:enemy_progressBar_width, height: 30))
         enemy_progressBar.position = CGPoint(x:350, y: 360.0)
         enemy_progressBar.zPosition = 10
         enemy_progressBar.anchorPoint = CGPoint(x: 0.5, y: 0.5)
 
         self.addChild(enemy_progressBar)
-     */
+     
         index_arrow = SKSpriteNode(imageNamed: "index_arrow")
         index_arrow.position = CGPoint(x:-650.0, y: -310.0)
-        index_arrow.zPosition = 10
+        index_arrow.zPosition = 8
         index_arrow.size = CGSize(width: 100, height: 100)
         self.addChild(index_arrow)
         
@@ -463,7 +416,7 @@ class GameScene: SKScene,SKPhysicsContactDelegate {
         }
       
         
-       characterTimer = Timer.scheduledTimer(withTimeInterval: TimeInterval(arc4random_uniform(1) + 3), repeats: true) { [weak self] (timer) in
+        characterTimer = Timer.scheduledTimer(withTimeInterval: TimeInterval(Int(arc4random_uniform(1)) + Int.random(in: 6...8)), repeats: true) { [weak self] (timer) in
            
                self?.createEnemy()
            
@@ -492,7 +445,7 @@ class GameScene: SKScene,SKPhysicsContactDelegate {
             enemy = Knight(index:randomIndex,id:enemy_id,name: "Samurai",hp:10000, power: 1000,velocity: -50, type:SKSpriteNode(imageNamed: "s_1"))
             
        case 1:
-           enemy = Knight(index:randomIndex,id:enemy_id,name: "Shadow",hp:10000, power: 1000,velocity: -50, type:SKSpriteNode(imageNamed: "s_walk_1"))
+           enemy = Knight(index:randomIndex,id:enemy_id,name: "Skeleton",hp:10000, power: 1000,velocity: -50, type:SKSpriteNode(imageNamed: "s_walk_1"))
    
         
        default:
@@ -556,7 +509,7 @@ class GameScene: SKScene,SKPhysicsContactDelegate {
             knight = Knight(index:index,id:knight_id,name: "Samurai",hp:10000, power: 1000,velocity: 50, type:SKSpriteNode(imageNamed: "s_1"))
             
        case 1:
-           knight = Knight(index:index,id:knight_id,name: "Skeleton",hp:10000, power: 1000,velocity: 50, type:SKSpriteNode(imageNamed: "s_walk_1"))
+           knight = Knight(index:index,id:knight_id,name: "Skeleton",hp:10000, power: 1500,velocity: 50, type:SKSpriteNode(imageNamed: "s_walk_1"))
    
         
        default:
@@ -612,7 +565,17 @@ knight_id += 2
         
     }
  
-    
+    func updateCoolDown(){
+        game?.isCoolDown = true
+        ok_button.isHidden = true
+        if game?.isCoolDown == true {
+        }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.8) { [self] in
+            game?.isCoolDown = false
+            if game?.isCoolDown == false {
+                ok_button.isHidden = false
+            }
+        }}
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         for touch in touches {
@@ -622,7 +585,12 @@ knight_id += 2
                 
                 let node = self.atPoint(location)
                 if node == ok_button {
-                    createKnight(index:selectedIndex)
+                    if   game?.isCoolDown == false {
+                           createKnight(index:selectedIndex)
+
+                       }
+              updateCoolDown()
+               
                 }
                 if node == up_button {
                     if selectedIndex < 5 {
@@ -686,12 +654,15 @@ knight_id += 2
            arrow.run(moveAction)
     }
     func battleKnight(){
+        
+        
+        
         if isBattleIndex1 == true {
             print((knightsIndex1.first?.name)!)
           
             knightsIndex1.first?.velocity = 0
             enemiesIndex_1.first?.velocity = 0
-           var result =  battle1.battle()
+            let result =  battle1.battle()
             print(result)
             if result.isDone == true {
                 isBattleIndex1 = false
@@ -830,17 +801,17 @@ knight_id += 2
              }
         }
         
-       
+    
     }
     var counter: TimeInterval = 0
-    let interval: TimeInterval = 300000
+    let interval: TimeInterval = 30000000
     
     override func update(_ currentTime: TimeInterval) {
         counter += currentTime
               
               if counter >= interval {
                   // Belirli bir işlemi yürüt
-                  print("2 saniye geçti!")
+              
                   if isBattleIndex1 == true || isBattleIndex2 == true || isBattleIndex3 == true || isBattleIndex4 == true  || isBattleIndex5 == true || isBattleIndex6 == true  {
                       playSound()
                   }
@@ -1098,4 +1069,3 @@ knight_id += 2
           
         }
     }
->>>>>>> 2b54813 (Initial Commit)
