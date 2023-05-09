@@ -47,7 +47,6 @@ class GameScene: SKScene,SKPhysicsContactDelegate {
   
 
     var my_side:SKSpriteNode!
-    var circle:SKShapeNode!
     var enemy_side:SKSpriteNode!
     var label1:SKLabelNode!
     var label2:SKLabelNode!
