@@ -13,6 +13,8 @@ class HomeScene: SKScene{
     private var title : SKLabelNode?
     private var irk_secimi_label: SKLabelNode?
     private var knight_img: SKSpriteNode?
+    private var sensei_img: SKSpriteNode?
+
     private var knight_title: SKLabelNode?
     private var knight_desc: SKLabelNode?
     private var main_menu: SKLabelNode?
@@ -31,6 +33,7 @@ class HomeScene: SKScene{
         self.title = self.childNode(withName: "//title") as? SKLabelNode
         self.irk_secimi_label = self.childNode(withName: "//irk_secimi_label") as? SKLabelNode
         self.knight_img = self.childNode(withName: "//knight_img") as? SKSpriteNode
+        self.sensei_img = self.childNode(withName: "//sensei_img") as? SKSpriteNode
         self.knight_title = self.childNode(withName: "//knight_title") as? SKLabelNode
         self.knight_desc = self.childNode(withName: "//knight_desc") as? SKLabelNode
         self.main_menu = self.childNode(withName: "//main_menu") as? SKLabelNode
@@ -56,7 +59,7 @@ class HomeScene: SKScene{
         if isMain == false {
             irk_secimi_label?.isHidden = false
             knight_img?.isHidden = false
-
+            sensei_img?.isHidden = false
             knight_title?.isHidden = false
 
             knight_desc?.isHidden = false
@@ -72,7 +75,7 @@ class HomeScene: SKScene{
         else {
             irk_secimi_label?.isHidden = true
             knight_img?.isHidden = true
-
+            sensei_img?.isHidden = true
             knight_title?.isHidden = true
 
             knight_desc?.isHidden = true
@@ -85,7 +88,7 @@ class HomeScene: SKScene{
         }
     }
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-        for touch in touches {
+        for _ in touches {
             for touch in touches {
                 let location = touch.location(in: self)
                 print(location)

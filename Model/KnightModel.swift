@@ -11,7 +11,8 @@ import SpriteKit
 
 
 class Knight {
-    
+    var samuraiSize = CGSize(width: 100, height: 100)
+    var senseiSize = CGSize(width: 120, height: 120)
   
     let followDistance: CGFloat = 205 // Takip mesafesi
     let arrowDistance: CGFloat = 400
@@ -34,16 +35,14 @@ class Knight {
     
    
     var index:Int
-    var id:Int
     var name: String
     var hp:Int
       var power: Int
     var velocity:Int
     var type : SKSpriteNode
       
-    init(index:Int,id:Int,name: String,hp:Int, power: Int,velocity:Int, type :SKSpriteNode) {
+    init(index:Int,name: String,hp:Int = 10000, power: Int = 1000,velocity:Int = 50, type :SKSpriteNode) {
         self.index = index
-        self.id = id
           self.name = name
         self.hp = hp
           self.power = power

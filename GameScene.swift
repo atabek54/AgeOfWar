@@ -17,8 +17,6 @@ var knightsIndex5 = [Knight]()
 var knightsIndex6 = [Knight]()
 
 
-
-
 var enemiesIndex_1 = [Knight]()
 var enemiesIndex_2 = [Knight]()
 var enemiesIndex_3 = [Knight]()
@@ -26,26 +24,10 @@ var enemiesIndex_4 = [Knight]()
 var enemiesIndex_5 = [Knight]()
 var enemiesIndex_6 = [Knight]()
 
-var samuraiSize = CGSize(width: 100, height: 100)
-var skeletonSize = CGSize(width: 85, height: 85)
 
-
-
-var isBattleIndex1 = false
-var isBattleIndex2 = false
-var isBattleIndex3 = false
-var isBattleIndex4 = false
-var isBattleIndex5 = false
-var isBattleIndex6 = false
-
-var isAttackToCastle = false
-var knight_id = 0
-var enemy_id = 0
 var randomIndex = 0
 var selectedIndex = 0
-
 var selectedCharacterIndex = 0
-
 
 
 var battle1:Battle!
@@ -56,18 +38,13 @@ var battle5:Battle!
 var battle6:Battle!
 
 class GameScene: SKScene,SKPhysicsContactDelegate {
-    let enemyCategory:UInt32 = 0x1
-    let knightCategory:UInt32 = 0x10
-    let mySideCategory:UInt32 = 0x100
-    let enemySideCategory:UInt32 = 0x1000
+   
 
-    var isBattleIndex = [false,false ,false , false,false,false ]
 
     
     var my_progressBar:SKSpriteNode!
     var enemy_progressBar:SKSpriteNode!
-    var my_progressBar_width = 690
-    var enemy_progressBar_width = 690
+  
 
     var my_side:SKSpriteNode!
     var circle:SKShapeNode!
@@ -91,22 +68,13 @@ class GameScene: SKScene,SKPhysicsContactDelegate {
 
 
 
-    // Buton pozisyonunu ayarla
-    private var samuraiTextures:[SKTexture] = []
-    private var skeletonTextures:[SKTexture] = []
-
-    private var skeletonAttackTextures:[SKTexture] = []
-
-    private var enemyTextures:[SKTexture] = []
-
+  
     
 
     
 
 
 
-    var battleTimer: Timer?
-    var attackToCastleTimer:Timer?
     var characterTimer: Timer?
 
     func playSound(){
@@ -115,28 +83,28 @@ class GameScene: SKScene,SKPhysicsContactDelegate {
     }
     
     func didBegin(_ contact: SKPhysicsContact){
-        let bodyA = contact.bodyA.node?.name
-        let bodyB = contact.bodyB.node?.name
-        switch Int(bodyA!) {
-       case 0:
-      isBattleIndex1 = true
+        let bodyA = contact.bodyA.node?.name?.last
+       
+        switch bodyA {
+       case "0":
+            game!.isBattleIndex1 = true
             battle1 = Battle(knight: knightsIndex1.first!, enemy: enemiesIndex_1.first!)
-       case 1:
-            isBattleIndex2 = true
+       case "1":
+            game!.isBattleIndex2 = true
             battle2 = Battle(knight: knightsIndex2.first!, enemy: enemiesIndex_2.first!)
-       case 2:
-            isBattleIndex3 = true
+       case "2":
+            game!.isBattleIndex3 = true
             battle3 = Battle(knight: knightsIndex3.first!, enemy: enemiesIndex_3.first!)
-       case 3:
-            isBattleIndex4 = true
+       case "3":
+            game!.isBattleIndex4 = true
             battle4 = Battle(knight: knightsIndex4.first!, enemy: enemiesIndex_4.first!)
            
-        case 4:
-            isBattleIndex5 = true
+        case "4":
+            game!.isBattleIndex5 = true
             battle5 = Battle(knight: knightsIndex5.first!, enemy: enemiesIndex_5.first!)
             
-        case 5:
-            isBattleIndex6 = true
+        case "5":
+            game!.isBattleIndex6 = true
             battle6 = Battle(knight: knightsIndex6.first!, enemy: enemiesIndex_6.first!)
          
         
@@ -147,66 +115,45 @@ class GameScene: SKScene,SKPhysicsContactDelegate {
         
 
         
-        print("Contant \(bodyA) and \(bodyB)")
         
         let collision : UInt32 = contact.bodyA.categoryBitMask | contact.bodyB.categoryBitMask
-        if collision == knightCategory | knightCategory {
-        print("Dostlar meydanda görsün.!")
+        if collision == game!.knightCategory | game!.knightCategory {
             contact.bodyA.node?.physicsBody?.velocity = CGVector(dx: 0, dy: 0)
             contact.bodyB.node?.physicsBody?.velocity = CGVector(dx: 0, dy: 0)
-            
-          
-
     }
-    
-      else  if collision == knightCategory | enemyCategory {
-          print(contact.bodyA.node?.name)
-          print(contact.bodyB.node?.name)
-          if (contact.bodyA.node?.name)! == "Skeleton" {
-              print("HAHAHAHHA")
-              let animation = SKAction.animate(with:skeletonAttackTextures, timePerFrame: 0.1)
-              let animationRepeat = SKAction.repeatForever(animation)
-              contact.bodyA.node!.run(animationRepeat)
-          }
-          if (contact.bodyB.node?.name)! == "Skeleton" {
-              print("HAHAHAHHA")
-              let animation = SKAction.animate(with:skeletonAttackTextures, timePerFrame: 0.1)
-              let animationRepeat = SKAction.repeatForever(animation)
-              contact.bodyB.node!.run(animationRepeat)
-          }
+       
+        else if collision == game!.knightCategory | game!.enemyCategory {
+            let nameA = (contact.bodyA.node?.name)
+            let nameB = (contact.bodyB.node?.name)
+            if nameA!.prefix(6) == "Sensei" {
+                game!.changeAnimation(texture: game!.senseiAttackTextures, knight: contact.bodyA.node! as! SKSpriteNode)
+            }
+            if nameB!.prefix(6) == "Sensei" {
+                game!.changeAnimation(texture: game!.senseiAttackTextures, knight: contact.bodyB.node! as! SKSpriteNode)
+            }
             
-          
-          
-      }
-        else  if collision == enemyCategory | knightCategory {
-            print(contact.bodyA.node?.name)
-            print(contact.bodyB.node?.name)
          
-            
-            
         }
-        else  if collision == mySideCategory | enemyCategory {
-             
-          let name =  contact.bodyB.node?.name
-            
-            switch Int(name!) {
-           case 0:
+        else  if collision == game!.mySideCategory | game!.enemyCategory {
+            let name =  contact.bodyB.node?.name?.last
+            switch name {
+           case "0":
                 enemiesIndex_1.first?.type.removeFromParent()
                 enemiesIndex_1.remove(at: 0)
-           case 1:
+           case "1":
                 enemiesIndex_2.first?.type.removeFromParent()
                 enemiesIndex_2.remove(at: 0)
-           case 2:
+           case "2":
                 enemiesIndex_3.first?.type.removeFromParent()
                 enemiesIndex_3.remove(at: 0)
-           case 3:
+           case "3":
                 enemiesIndex_4.first?.type.removeFromParent()
                 enemiesIndex_4.remove(at: 0)
 
-            case 4:
+            case "4":
                 enemiesIndex_5.first?.type.removeFromParent()
                 enemiesIndex_5.remove(at: 0)
-            case 5:
+            case "5":
                 enemiesIndex_6.first?.type.removeFromParent()
                 enemiesIndex_6.remove(at: 0)
             
@@ -216,13 +163,9 @@ class GameScene: SKScene,SKPhysicsContactDelegate {
             // Düşman puan kazandı
             game?.enemyPoint += 100
             game?.myPoint -= 100
-           
-            my_progressBar.position.x -= CGFloat(40)
-            enemy_progressBar.position.x -= CGFloat(40)
-            enemy_progressBar.size.width += CGFloat(80)
-            print(game?.enemyPoint)
+            updateProgressBar(isMine: false)
+     
             if game!.enemyPoint > 1699 {
-                game?.amIWinner = false
                 let scene = GameOver(fileNamed: "GameOver")
                 scene?.win = false
                 
@@ -235,10 +178,9 @@ class GameScene: SKScene,SKPhysicsContactDelegate {
             
             
         }
-        else  if collision == enemySideCategory | knightCategory {
+        else  if collision == game!.enemySideCategory | game!.knightCategory {
              
           let name =  contact.bodyB.node?.name
-            print("NAME : \(name)")
             switch Int(name!) {
            case 0:
                 knightsIndex1.first?.type.removeFromParent()
@@ -266,12 +208,9 @@ class GameScene: SKScene,SKPhysicsContactDelegate {
             //BEN PUAN KAZANDIM
             game?.myPoint += 100
             game?.enemyPoint -= 100
-          
-            enemy_progressBar.position.x += CGFloat(40)
-            my_progressBar.position.x += CGFloat(40)
-            my_progressBar.size.width += CGFloat(80)
+            
+         updateProgressBar(isMine: true)
             if game!.myPoint > 1699 {
-                game?.amIWinner = true
                 let scene = GameOver(fileNamed: "GameOver")
                 scene?.win = true
                 
@@ -285,7 +224,17 @@ class GameScene: SKScene,SKPhysicsContactDelegate {
     
        }
     
-   
+    func updateProgressBar(isMine:Bool){
+        if isMine {
+            enemy_progressBar.position.x += CGFloat(40)
+            my_progressBar.position.x += CGFloat(40)
+            my_progressBar.size.width += CGFloat(80)
+        } else {
+            my_progressBar.position.x -= CGFloat(40)
+            enemy_progressBar.position.x -= CGFloat(20)
+            enemy_progressBar.size.width += CGFloat(40)
+        }
+    }
     func changeLabelColor(index:Int){
         if index == 0 {
             label1.fontColor = .systemGreen
@@ -297,12 +246,11 @@ class GameScene: SKScene,SKPhysicsContactDelegate {
     }
         
     override func didMove(to view: SKView) {
-         isBattleIndex = [false,false ,false , false,false,false ]
 
         self.physicsWorld.contactDelegate = self
         selectedIndex = 0
         selectedCharacterIndex = 0
-        game = Game(time: 500, myPoint: 0, enemyPoint: 0, amIWinner: false, isCoolDown: false)
+        game = Game(myPoint: 0, enemyPoint: 0, isCoolDown: false)
        
        label1 = SKLabelNode(text: "Samuray")
         label1.zPosition = 8
@@ -313,12 +261,12 @@ class GameScene: SKScene,SKPhysicsContactDelegate {
         label1.fontColor = .systemGreen
         self.addChild(label1)
         
-         label2 = SKLabelNode(text: "Skeleton")
+         label2 = SKLabelNode(text: "Sensei")
           label2.zPosition = 8
           label2.position = CGPoint(x: -300, y: 300)
           label2.fontName = "Helvetica-Bold"
           label2.fontSize = 30
-          label2.fontColor =  .white
+        label2.fontColor =  .white.withAlphaComponent(0.7)
           self.addChild(label2)
        
         
@@ -331,8 +279,8 @@ class GameScene: SKScene,SKPhysicsContactDelegate {
         my_side.physicsBody?.allowsRotation = false
         my_side.physicsBody?.isDynamic = false
         my_side.physicsBody?.affectedByGravity = false
-        my_side.physicsBody?.categoryBitMask=mySideCategory
-        my_side.physicsBody?.contactTestBitMask=enemyCategory
+        my_side.physicsBody?.categoryBitMask = game!.mySideCategory
+        my_side.physicsBody?.contactTestBitMask = game!.enemyCategory
         my_side.name = "my_side"
         self.addChild(my_side)
         //enemy_side
@@ -343,19 +291,19 @@ class GameScene: SKScene,SKPhysicsContactDelegate {
         enemy_side.physicsBody?.allowsRotation = false
         enemy_side.physicsBody?.isDynamic = false
         enemy_side.physicsBody?.affectedByGravity = false
-        enemy_side.physicsBody?.categoryBitMask=enemySideCategory
-        enemy_side.physicsBody?.contactTestBitMask=knightCategory
+        enemy_side.physicsBody?.categoryBitMask = game!.enemySideCategory
+        enemy_side.physicsBody?.contactTestBitMask = game!.knightCategory
         enemy_side.name = "enemy_side"
         self.addChild(enemy_side)
         
     
-        my_progressBar = SKSpriteNode(color: .green.withAlphaComponent(0.5), size: CGSize(width:my_progressBar_width, height: 30))
+        my_progressBar = SKSpriteNode(color: .green, size: CGSize(width:game!.my_progressBar_width, height: 30))
         my_progressBar.position = CGPoint(x:-350, y: 360.0)
         my_progressBar.zPosition = 10
         my_progressBar.anchorPoint = CGPoint(x: 0.5, y: 0.5)
         self.addChild(my_progressBar)
   
-        enemy_progressBar = SKSpriteNode(color: .red.withAlphaComponent(0.5), size: CGSize(width:enemy_progressBar_width, height: 30))
+        enemy_progressBar = SKSpriteNode(color: .red, size: CGSize(width:game!.enemy_progressBar_width, height: 30))
         enemy_progressBar.position = CGPoint(x:350, y: 360.0)
         enemy_progressBar.zPosition = 10
         enemy_progressBar.anchorPoint = CGPoint(x: 0.5, y: 0.5)
@@ -405,20 +353,20 @@ class GameScene: SKScene,SKPhysicsContactDelegate {
         
         
        for i in 1...8{
-            samuraiTextures.append(SKTexture(imageNamed: "s_\(i)"))
+           game!.samuraiTextures.append(SKTexture(imageNamed: "s_\(i)"))
         }
         for i in 1...8{
-            skeletonTextures.append(SKTexture(imageNamed: "s_walk_\(i)"))
+            game!.senseiTextures.append(SKTexture(imageNamed: "k\(i)"))
          }
-        for i in 1...10 {
-            skeletonAttackTextures.append(SKTexture(imageNamed: "s_attack_\(i)"))
-
-        }
+        for i in 1...13{
+            game!.senseiAttackTextures.append(SKTexture(imageNamed: "a\(i)"))
+         }
+       
       
         
         characterTimer = Timer.scheduledTimer(withTimeInterval: TimeInterval(Int(arc4random_uniform(1)) + Int.random(in: 6...8)), repeats: true) { [weak self] (timer) in
            
-               self?.createEnemy()
+            self?.createEnemy()
            
                 }
         
@@ -429,23 +377,23 @@ class GameScene: SKScene,SKPhysicsContactDelegate {
        
 
         
-       // createKnight(p:125)
+
      
     }
 
     func createEnemy(){
     
         let random = Int.random(in: 0...1)
-        randomIndex = Int.random(in: 0...5)
+        randomIndex =  Int.random(in: 0...5)
         print("RANDOM : \(randomIndex)")
-        var enemy = Knight(index:randomIndex,id:enemy_id,name: "Samurai",hp:10000, power: 1000,velocity: -50, type:SKSpriteNode(imageNamed: "s_1"))
+        var enemy = Knight(index:randomIndex,name: "Samurai\(randomIndex)",velocity: -50, type:SKSpriteNode(imageNamed: "s_1"))
         
-        switch selectedCharacterIndex {
+        switch random {
        case 0:
-            enemy = Knight(index:randomIndex,id:enemy_id,name: "Samurai",hp:10000, power: 1000,velocity: -50, type:SKSpriteNode(imageNamed: "s_1"))
+            enemy = Knight(index:randomIndex,name: "Samurai\(randomIndex)",power: 1500,velocity: -50, type:SKSpriteNode(imageNamed: "s_1"))
             
        case 1:
-           enemy = Knight(index:randomIndex,id:enemy_id,name: "Skeleton",hp:10000, power: 1000,velocity: -50, type:SKSpriteNode(imageNamed: "s_walk_1"))
+           enemy = Knight(index:randomIndex,name: "Sensei\(randomIndex)", power: 2500,velocity: -50, type:SKSpriteNode(imageNamed: "s_walk_1"))
    
         
        default:
@@ -477,39 +425,44 @@ class GameScene: SKScene,SKPhysicsContactDelegate {
        default:
            print("Değer belirtilen aralıklarda değil.")
        }
- 
-        
+        enemy.type.name = random == 0 ? "Samurai\(randomIndex)" : "Sensei\(randomIndex)"
         enemy.type.position = CGPoint(x: 632  , y: positionY)
         enemy.type.zPosition = 10
-        enemy.type.size = random == 0 ? samuraiSize : skeletonSize
-        enemy.type.name = "\(randomIndex)"
+        enemy.type.size = random == 0 ? enemy.samuraiSize : enemy.senseiSize
         enemy.type.physicsBody?.allowsRotation = false
         enemy.type.physicsBody?.isDynamic = false
-        enemy.type.xScale = random == 1 ? 1 : -1
+        enemy.type.xScale = random == 1 ? -1 : -1
         enemy.type.physicsBody = SKPhysicsBody.init(circleOfRadius:random == 0 ? 30 : 20)
-        enemy.type.physicsBody?.categoryBitMask=enemyCategory
-        enemy.type.physicsBody?.contactTestBitMask=enemyCategory | knightCategory | mySideCategory
+        enemy.type.physicsBody?.categoryBitMask = game!.enemyCategory
+        enemy.type.physicsBody?.contactTestBitMask = game!.enemyCategory | game!.knightCategory | game!.mySideCategory
 
         enemy.type.physicsBody?.affectedByGravity = false
         addChild(enemy.type)
         
-        let animation = SKAction.animate(with:random == 0 ? samuraiTextures : skeletonTextures, timePerFrame: 0.1)
+        let animation = SKAction.animate(with:random == 0 ? game!.samuraiTextures : game!.senseiTextures, timePerFrame: 0.1)
         let animationRepeat = SKAction.repeatForever(animation)
         enemy.type.run(animationRepeat)
 
-      enemy_id += 1
+    
         
     }
 
     func createKnight(index:Int){
-        var knight = Knight(index:index,id:knight_id,name: "Samurai",hp:10000, power: 1000,velocity: 50, type:SKSpriteNode(imageNamed: "archer_walk_1"))
+        var knight = Knight(index:index,name: "Samurai\(selectedIndex)", type:SKSpriteNode(imageNamed: "k1"))
       
         switch selectedCharacterIndex {
        case 0:
-            knight = Knight(index:index,id:knight_id,name: "Samurai",hp:10000, power: 1000,velocity: 50, type:SKSpriteNode(imageNamed: "s_1"))
+            knight = Knight(index:index,
+                            name: "Samurai\(selectedIndex)",
+                            type:SKSpriteNode(imageNamed: "s_1")
+            )
             
        case 1:
-           knight = Knight(index:index,id:knight_id,name: "Skeleton",hp:10000, power: 1500,velocity: 50, type:SKSpriteNode(imageNamed: "s_walk_1"))
+           knight = Knight(index:index,
+                           name: "Sensei\(selectedIndex)",
+                           power: 2500,
+                           type:SKSpriteNode(imageNamed: "s_walk_1")
+           )
    
         
        default:
@@ -541,26 +494,23 @@ class GameScene: SKScene,SKPhysicsContactDelegate {
         default:
             print("Değer belirtilen aralıklarda değil.")
         }
-        
-    
+        knight.type.name = selectedCharacterIndex == 0 ? "Samurai\(selectedIndex)" : "Sensei\(selectedIndex)"
         knight.type.position = CGPoint(x: -650  , y: positionY)
         knight.type.zPosition = 10
-        knight.type.size = selectedCharacterIndex == 0 ? samuraiSize : skeletonSize
-        knight.type.name = "\(selectedIndex)"
+        knight.type.size = selectedCharacterIndex == 0 ? knight.samuraiSize : knight.senseiSize
         knight.type.physicsBody?.allowsRotation = false
         knight.type.physicsBody?.isDynamic = false
         knight.type.physicsBody?.linearDamping = 1000
         knight.type.physicsBody = SKPhysicsBody.init(circleOfRadius:selectedCharacterIndex == 0 ? 30 : 20)
-        knight.type.physicsBody?.categoryBitMask=knightCategory
-        knight.type.physicsBody?.contactTestBitMask=enemyCategory | knightCategory | mySideCategory
-        knight.type.xScale = selectedCharacterIndex == 0 ?  1 : -1
+        knight.type.physicsBody?.categoryBitMask = game!.knightCategory
+        knight.type.physicsBody?.contactTestBitMask = game!.enemyCategory | game!.knightCategory | game!.mySideCategory
+        knight.type.xScale = selectedCharacterIndex == 0 ?  1 : 1
         knight.type.physicsBody?.affectedByGravity = false
         addChild(knight.type)
-        
-        let animation = SKAction.animate(with:selectedCharacterIndex == 0 ?  samuraiTextures:skeletonTextures, timePerFrame: 0.15)
+
+        let animation = SKAction.animate(with:selectedCharacterIndex == 0 ?  game!.samuraiTextures:game!.senseiTextures, timePerFrame: 0.15)
         let animationRepeat = SKAction.repeatForever(animation)
         knight.type.run(animationRepeat)
-knight_id += 2
       
         
     }
@@ -578,7 +528,7 @@ knight_id += 2
         }}
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-        for touch in touches {
+        for _ in touches {
             for touch in touches {
                 let location = touch.location(in: self)
                 print(location)
@@ -599,8 +549,7 @@ knight_id += 2
                         index_arrow.position.y += 120
                     }
                     
-                    print(selectedIndex)
-                    print("up button tıklandı!")
+                    
                     
                     
                     
@@ -612,8 +561,7 @@ knight_id += 2
                         
                     }
                     
-                    print(selectedIndex)
-                    print("down button tıklandı!")
+        
                     
                 }
                 if node == left_button {
@@ -624,19 +572,15 @@ knight_id += 2
 
                     }
                     
-                    print("left button tıklandı!")
-                    print(selectedCharacterIndex)
+              
 
                 }
                 if node == right_button {
-                    // Bu, mySprite'a dokunulduğunda çalışacak fonksiyonunuzu çağırmak için bir yerdir.
-                    print("right button tıklandı!")
                     if selectedCharacterIndex < 1 {
                         selectedCharacterIndex += 1
                         changeLabelColor(index: selectedCharacterIndex)
 
                     }
-                    print(selectedCharacterIndex)
 
                 }
                 
@@ -657,146 +601,139 @@ knight_id += 2
         
         
         
-        if isBattleIndex1 == true {
-            print((knightsIndex1.first?.name)!)
+        if game!.isBattleIndex1 == true {
           
             knightsIndex1.first?.velocity = 0
             enemiesIndex_1.first?.velocity = 0
             let result =  battle1.battle()
-            print(result)
             if result.isDone == true {
-                isBattleIndex1 = false
+                game!.isBattleIndex1 = false
                 if result.amIWinner == true {
                     enemiesIndex_1.first?.type.removeFromParent()
                     enemiesIndex_1.remove(at: 0)
                     knightsIndex1.first?.velocity = 50
-
                     knightsIndex1.first?.hp = result.hp
+                    game?.changeAnimation(texture: knightsIndex1.first?.type.name?.prefix(6) == "Sensei" ? game!.senseiTextures:game!.samuraiTextures, knight:    knightsIndex1.first?.type as! SKSpriteNode)
                 }else {
                     knightsIndex1.first?.type.removeFromParent()
                     knightsIndex1.remove(at: 0)
                     enemiesIndex_1.first?.velocity = -50
-
                     enemiesIndex_1.first?.hp = result.hp
+                    game?.changeAnimation(texture: enemiesIndex_1.first?.type.name?.prefix(6) == "Sensei" ? game!.senseiTextures:game!.samuraiTextures, knight: enemiesIndex_1.first?.type as! SKSpriteNode)
                 }
             }
          
             
         }
-         if isBattleIndex2 == true {
+        if game!.isBattleIndex2 == true {
           //  print("2. sırada savaş var")
              knightsIndex2.first?.velocity = 0
              enemiesIndex_2.first?.velocity = 0
-             var result =  battle2.battle()
-              print(result)
+            let result =  battle2.battle()
               if result.isDone == true {
-                  isBattleIndex2 = false
+                  game!.isBattleIndex2 = false
                   if result.amIWinner == true {
                       enemiesIndex_2.first?.type.removeFromParent()
                       enemiesIndex_2.remove(at: 0)
                       knightsIndex2.first?.velocity = 50
-
                       knightsIndex2.first?.hp = result.hp
+                      game?.changeAnimation(texture:knightsIndex2.first?.type.name?.prefix(6) == "Sensei" ? game!.senseiTextures:game!.samuraiTextures, knight:    knightsIndex2.first?.type as! SKSpriteNode)
                   }else {
                       knightsIndex2.first?.type.removeFromParent()
                       knightsIndex2.remove(at: 0)
                       enemiesIndex_2.first?.velocity = -50
-
                       enemiesIndex_2.first?.hp = result.hp
+                      game?.changeAnimation(texture: enemiesIndex_2.first?.type.name?.prefix(6) == "Sensei" ? game!.senseiTextures:game!.samuraiTextures, knight:    enemiesIndex_2.first?.type as! SKSpriteNode)
                   }
               }
           
         }
-        if isBattleIndex3 == true {
+        if game!.isBattleIndex3 == true {
             knightsIndex3.first?.velocity = 0
             enemiesIndex_3.first?.velocity = 0
          //   print("3. sırada savaş var")
-            var result =  battle3.battle()
-             print(result)
+            let result =  battle3.battle()
              if result.isDone == true {
-                 isBattleIndex3 = false
+                 game!.isBattleIndex3 = false
                  if result.amIWinner == true {
                      enemiesIndex_3.first?.type.removeFromParent()
                      enemiesIndex_3.remove(at: 0)
                      knightsIndex3.first?.velocity = 50
-
                      knightsIndex3.first?.hp = result.hp
+                     game?.changeAnimation(texture: knightsIndex3.first?.type.name?.prefix(6) == "Sensei" ? game!.senseiTextures:game!.samuraiTextures, knight:    knightsIndex3.first?.type as! SKSpriteNode)
                  }else {
                      knightsIndex3.first?.type.removeFromParent()
                      knightsIndex3.remove(at: 0)
                      enemiesIndex_3.first?.velocity = -50
-
                      enemiesIndex_3.first?.hp = result.hp
+                     game?.changeAnimation(texture: enemiesIndex_3.first?.type.name?.prefix(6) == "Sensei" ? game!.senseiTextures:game!.samuraiTextures, knight:    enemiesIndex_3.first?.type as! SKSpriteNode)
                  }
              }
         }
-        if isBattleIndex4 == true {
+        if game!.isBattleIndex4 == true {
             knightsIndex4.first?.velocity = 0
             enemiesIndex_4.first?.velocity = 0
          //   print("4. sırada savaş var")
-            var result =  battle4.battle()
-             print(result)
+            let result =  battle4.battle()
              if result.isDone == true {
-                 isBattleIndex4 = false
+                 game!.isBattleIndex4 = false
                  if result.amIWinner == true {
                      enemiesIndex_4.first?.type.removeFromParent()
                      enemiesIndex_4.remove(at: 0)
                      knightsIndex4.first?.velocity = 50
-
                      knightsIndex4.first?.hp = result.hp
+                     game?.changeAnimation(texture:knightsIndex4.first?.type.name?.prefix(6) == "Sensei" ? game!.senseiTextures:game!.samuraiTextures, knight:    knightsIndex4.first?.type as! SKSpriteNode)
                  }else {
                      knightsIndex4.first?.type.removeFromParent()
                      knightsIndex4.remove(at: 0)
                      enemiesIndex_4.first?.velocity = -50
-
                      enemiesIndex_4.first?.hp = result.hp
+                     game?.changeAnimation(texture: enemiesIndex_4.first?.type.name?.prefix(6) == "Sensei" ? game!.senseiTextures:game!.samuraiTextures, knight:    enemiesIndex_4.first?.type as! SKSpriteNode)
                  }
              }
         }
-        if isBattleIndex5 == true {
+        if game!.isBattleIndex5 == true {
             knightsIndex5.first?.velocity = 0
             enemiesIndex_5.first?.velocity = 0
          //   print("5. sırada savaş var")
-            var result =  battle5.battle()
-             print(result)
+            let result =  battle5.battle()
              if result.isDone == true {
-                 isBattleIndex5 = false
+                 game!.isBattleIndex5 = false
                  if result.amIWinner == true {
                      enemiesIndex_5.first?.type.removeFromParent()
                      enemiesIndex_5.remove(at: 0)
                      knightsIndex5.first?.velocity = 50
-
                      knightsIndex5.first?.hp = result.hp
+                     game?.changeAnimation(texture: knightsIndex5.first?.type.name?.prefix(6) == "Sensei" ? game!.senseiTextures:game!.samuraiTextures, knight:    knightsIndex5.first?.type as! SKSpriteNode)
                  }else {
                      knightsIndex5.first?.type.removeFromParent()
                      knightsIndex5.remove(at: 0)
                      enemiesIndex_5.first?.velocity = -50
-
                      enemiesIndex_5.first?.hp = result.hp
+                     game?.changeAnimation(texture: enemiesIndex_5.first?.type.name?.prefix(6) == "Sensei" ? game!.senseiTextures:game!.samuraiTextures, knight:    enemiesIndex_5.first?.type as! SKSpriteNode)
                  }
              }
         }
         
-        if isBattleIndex6 == true {
+        if game!.isBattleIndex6 == true {
             knightsIndex6.first?.velocity = 0
             enemiesIndex_6.first?.velocity = 0
            // print("6. sırada savaş var")
-            var result =  battle6.battle()
-             print(result)
+            let result =  battle6.battle()
              if result.isDone == true {
-                 isBattleIndex6 = false
+                 game!.isBattleIndex6 = false
                  if result.amIWinner == true {
                      enemiesIndex_6.first?.type.removeFromParent()
                      enemiesIndex_6.remove(at: 0)
                      knightsIndex6.first?.velocity = 50
-
                      knightsIndex6.first?.hp = result.hp
+                     game?.changeAnimation(texture: knightsIndex6.first?.type.name?.prefix(6) == "Sensei" ? game!.senseiTextures:game!.samuraiTextures, knight:knightsIndex6.first?.type as! SKSpriteNode)
                  }else {
                      knightsIndex6.first?.type.removeFromParent()
                      knightsIndex6.remove(at: 0)
                      enemiesIndex_6.first?.velocity = -50
-
                      enemiesIndex_6.first?.hp = result.hp
+                     game?.changeAnimation(texture:enemiesIndex_6.first?.type.name?.prefix(6) == "Sensei" ? game!.senseiTextures:game!.samuraiTextures, knight:    enemiesIndex_6.first?.type as! SKSpriteNode)
                  }
              }
         }
@@ -812,7 +749,7 @@ knight_id += 2
               if counter >= interval {
                   // Belirli bir işlemi yürüt
               
-                  if isBattleIndex1 == true || isBattleIndex2 == true || isBattleIndex3 == true || isBattleIndex4 == true  || isBattleIndex5 == true || isBattleIndex6 == true  {
+                  if game!.isBattleIndex1 == true || game!.isBattleIndex2 == true || game!.isBattleIndex3 == true || game!.isBattleIndex4 == true  || game!.isBattleIndex5 == true || game!.isBattleIndex6 == true  {
                       playSound()
                   }
                   // Sayaçı sıfırla
