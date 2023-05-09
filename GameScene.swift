@@ -53,28 +53,12 @@ class GameScene: SKScene,SKPhysicsContactDelegate {
     var label2:SKLabelNode!
 
     var index_arrow: SKSpriteNode!
-    var arrow: SKSpriteNode!
-
     var ok_button: SKSpriteNode!
     var up_button: SKSpriteNode!
     var down_button: SKSpriteNode!
     var left_button: SKSpriteNode!
     var right_button: SKSpriteNode!
-
-    
-  
-
     var game:Game?
-
-
-
-  
-    
-
-    
-
-
-
     var characterTimer: Timer?
 
     func playSound(){
@@ -590,13 +574,7 @@ class GameScene: SKScene,SKPhysicsContactDelegate {
         
         
     }
-    func shootArrow(arrow_position:CGPoint,target_position:CGPoint){
-        arrow.position = CGPoint(x: arrow_position.x + 50, y: arrow_position.y)
-        arrow.zRotation = 270
-        arrow.isHidden = false
-        let moveAction = SKAction.move(to: target_position, duration: 0.7)
-           arrow.run(moveAction)
-    }
+  
     func battleKnight(){
         
         
